@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Test the Classic Hub app on your phone with Expo Go: scan the QR code, sign in with code 123456 and try ordering and event booking.">
+<meta property="og:title" content="Help test Classic Hub">
+<meta property="og:description" content="Order from Accra kitchens or book them to cater your event. Scan to open the test app in Expo Go.">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="icon" href="favicon.png">
+<title>Classic Hub Beta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: a royal "canopy" band with the QR card overlapping it, then a single readable column of steps. */
+:root {
+  --canopy: #1E3A8A;
+  --midnight: #0E1B45;
+  --gold: #D4A017;
+  --gold-ink: #8A6508;
+  --gold-soft: #FBF1D6;
+  --bg: #F5F7FB;
+  --card: #FFFFFF;
+  --ink: #141A2E;
+  --sub: #5A6380;
+  --line: #E1E6F0;
+  --link: #1E3A8A;
+  --on-canopy: #FFFFFF;
+  --on-canopy-sub: rgba(255,255,255,.8);
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canopy: #16245A; --midnight: #060B1E; --gold: #D4A017; --gold-ink: #E8C35A; --gold-soft: #2D2511;
+    --bg: #0B1022; --card: #141B33; --ink: #EEF1F8; --sub: #A3ABC4; --line: #26304F; --link: #8FA8F0;
+    --on-canopy: #FFFFFF; --on-canopy-sub: rgba(255,255,255,.78); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --canopy: #16245A; --midnight: #060B1E; --gold: #D4A017; --gold-ink: #E8C35A; --gold-soft: #2D2511;
+  --bg: #0B1022; --card: #141B33; --ink: #EEF1F8; --sub: #A3ABC4; --line: #26304F; --link: #8FA8F0;
+  --on-canopy: #FFFFFF; --on-canopy-sub: rgba(255,255,255,.78); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--body); }
+.wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.canopy { background: var(--canopy); color: var(--on-canopy); border-radius: 0 0 36px 36px; }
+.canopy .wrap { padding-block: 28px 96px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 18px/1 var(--display); }
+.mark { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--gold); display: grid; place-items: center; font: 700 16px/1 var(--display); }
+h1 { font: 700 clamp(32px, 8vw, 46px)/1.08 var(--display); letter-spacing: -.01em; margin: 26px 0 10px; text-wrap: balance; }
+.lede { color: var(--on-canopy-sub); font-size: 17px; max-width: 34em; margin: 0; }
+.tag { display: inline-block; margin-top: 16px; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,.12); font-size: 13px; font-weight: 700; letter-spacing: .02em; }
+
+.qrcard { margin-top: -72px; background: var(--card); border: 1px solid var(--line); border-radius: 28px; padding: 22px; display: grid; grid-template-columns: 220px 1fr; gap: 22px; align-items: center; box-shadow: 0 10px 30px rgba(14,27,69,.12); }
+.qr { background: #FFFFFF; border-radius: 16px; padding: 10px; width: 220px; max-width: 100%; aspect-ratio: 1; }
+.qr svg { display: block; width: 100%; height: 100%; }
+.qrcard h2 { font: 700 22px/1.2 var(--display); margin: 0 0 6px; }
+.qrcard p { margin: 0; color: var(--sub); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 14px; font: 800 15px/1 var(--body); text-decoration: none; cursor: pointer; border: 0; }
+.btn-gold { background: var(--gold); color: #0E1B45; }
+.btn-ghost { background: transparent; color: var(--link); border: 1px solid var(--line); }
+.btn:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.linkbox { margin-top: 12px; font: 500 12.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--sub); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; overflow-wrap: anywhere; user-select: all; }
+.copied { font-size: 13px; color: var(--gold-ink); font-weight: 700; min-height: 1em; margin-top: 6px; }
+
+section { margin-top: 40px; }
+h3 { font: 700 26px/1.2 var(--display); margin: 0 0 14px; text-wrap: balance; }
+ol.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: s; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+ol.steps li::before { content: counter(s); width: 40px; height: 40px; border-radius: 12px; background: var(--midnight); color: var(--gold); display: grid; place-items: center; font: 700 18px/1 var(--display); }
+ol.steps strong { display: block; font-weight: 800; margin-bottom: 2px; }
+ol.steps p { margin: 0; color: var(--sub); min-width: 0; }
+.stores { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.code { font: 800 15px/1 var(--body); letter-spacing: .12em; background: var(--gold-soft); color: var(--gold-ink); padding: 3px 8px; border-radius: 6px; }
+
+.try { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.try div { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; min-width: 0; }
+.try b { display: block; font: 700 18px/1.25 var(--display); margin-bottom: 4px; }
+.try p { margin: 0; color: var(--sub); font-size: 15px; }
+.note { background: var(--gold-soft); border-radius: 18px; padding: 16px 18px; }
+.note ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.note li { color: var(--ink); }
+footer { margin-top: 40px; padding-block: 24px 40px; color: var(--sub); font-size: 13.5px; border-top: 1px solid var(--line); }
+
+@media (max-width: 560px) {
+  .qrcard { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .qrcard .actions { justify-content: center; }
+  .try { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { .btn { transition: transform .12s ease; } .btn:active { transform: scale(.97); } }
+</style>
+
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); color-scheme: light; }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+img, svg { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="canopy">
+  <div class="wrap">
+    <div class="brand"><span class="mark" aria-hidden="true">C</span>Classic Hub</div>
+    <h1>Help test Classic Hub</h1>
+    <p class="lede">Order from Accra kitchens, or book them to cater a wedding, funeral or office lunch. It runs on your phone through the free Expo Go app.</p>
+    <span class="tag">Test build · iPhone and Android</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="qrcard">
+    <div class="qr"><svg role="img" aria-label="QR code that opens Classic Hub in Expo Go" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43 43" shape-rendering="crispEdges"><path fill="#FFFFFF" d="M0 0h43v43H0z"/><path stroke="#0E1B45" d="M1 1.5h7m2 0h3m2 0h1m1 0h2m4 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h7M1 2.5h1m5 0h1m1 0h1m7 0h1m1 0h1m2 0h1m6 0h1m1 0h1m3 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h3m1 0h3m1 0h3m3 0h2m3 0h1m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h2m2 0h1m2 0h4m1 0h4m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m1 0h1m1 0h4m1 0h4m1 0h4m2 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m2 0h1m3 0h3m4 0h2m3 0h2m2 0h1m2 0h1m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h2m1 0h2m2 0h1m3 0h1m3 0h2m2 0h1m2 0h1m1 0h1M1 9.5h1m5 0h1m1 0h1m1 0h1m3 0h1m2 0h1m6 0h4m1 0h1m3 0h2m2 0h3M1 10.5h1m1 0h1m2 0h1m2 0h5m1 0h1m3 0h2m3 0h1m2 0h3m1 0h3m2 0h4M1 11.5h2m1 0h1m2 0h3m2 0h3m1 0h1m1 0h1m2 0h2m3 0h1m1 0h4m1 0h1m2 0h3M1 12.5h2m1 0h1m4 0h2m1 0h2m1 0h1m3 0h2m2 0h2m3 0h2m3 0h1m1 0h1m1 0h2m1 0h1M2 13.5h3m2 0h1m2 0h5m5 0h2m1 0h1m1 0h1m1 0h1m3 0h3m1 0h2m3 0h1M1 14.5h2m1 0h1m4 0h7m3 0h1m1 0h4m1 0h1m1 0h6m1 0h1m1 0h1m2 0h2M1 15.5h1m3 0h1m1 0h1m1 0h2m2 0h2m1 0h1m5 0h2m1 0h1m1 0h3m3 0h5m1 0h2M1 16.5h1m1 0h1m1 0h2m1 0h1m1 0h1m3 0h1m5 0h2m10 0h2m2 0h6M2 17.5h1m1 0h1m2 0h2m3 0h3m3 0h1m2 0h1m1 0h1m1 0h4m1 0h1m3 0h1m1 0h1m2 0h1M3 18.5h2m3 0h2m1 0h1m2 0h1m1 0h6m2 0h1m3 0h6m1 0h1m1 0h3m1 0h1M2 19.5h1m2 0h3m1 0h5m2 0h1m1 0h11m3 0h1m8 0h1M1 20.5h1m1 0h1m2 0h1m4 0h3m1 0h3m1 0h3m3 0h1m3 0h1m3 0h2m2 0h2m1 0h1M1 21.5h1m1 0h1m1 0h3m2 0h1m2 0h1m2 0h2m1 0h1m1 0h1m4 0h2m2 0h1m2 0h2m1 0h1m2 0h1m1 0h1M1 22.5h1m4 0h1m2 0h1m1 0h4m1 0h1m2 0h3m2 0h2m1 0h2m2 0h4m1 0h3M3 23.5h1m3 0h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m1 0h2m6 0h4M1 24.5h3m2 0h1m6 0h2m1 0h1m3 0h1m4 0h1m2 0h2m2 0h2m1 0h2m1 0h1m1 0h2M4 25.5h1m1 0h2m1 0h1m3 0h1m1 0h1m3 0h3m1 0h1m1 0h1m2 0h2m2 0h1m2 0h2m1 0h1m1 0h2M1 26.5h1m2 0h3m1 0h3m1 0h3m2 0h1m2 0h2m1 0h4m1 0h3m1 0h2m1 0h3m1 0h1m1 0h1M1 27.5h5m1 0h1m1 0h2m2 0h1m2 0h1m1 0h2m1 0h1m3 0h1m1 0h2m4 0h1m3 0h1M1 28.5h1m2 0h1m4 0h3m3 0h3m6 0h1m4 0h1m2 0h1m1 0h2m2 0h2m1 0h1M1 29.5h1m1 0h2m1 0h3m1 0h1m1 0h2m3 0h3m1 0h1m3 0h4m1 0h1m1 0h2m4 0h2M1 30.5h3m1 0h1m3 0h1m1 0h2m1 0h1m1 0h3m1 0h1m2 0h2m3 0h10m2 0h2M1 31.5h2m1 0h4m1 0h3m3 0h2m3 0h1m3 0h1m1 0h1m1 0h1m3 0h2m3 0h1m2 0h2M1 32.5h1m1 0h3m5 0h7m1 0h1m3 0h3m1 0h1m1 0h1m1 0h2m1 0h5m2 0h1M1 33.5h1m1 0h3m1 0h5m1 0h2m2 0h2m4 0h1m2 0h2m2 0h1m2 0h5m1 0h2M9 34.5h1m2 0h3m2 0h1m2 0h5m1 0h1m1 0h1m1 0h2m1 0h1m3 0h1m1 0h1M1 35.5h7m2 0h1m1 0h1m1 0h3m2 0h1m1 0h1m1 0h1m1 0h6m1 0h2m1 0h1m1 0h4M1 36.5h1m5 0h1m3 0h1m1 0h4m2 0h5m1 0h1m1 0h1m3 0h3m3 0h2m2 0h1M1 37.5h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h3m1 0h2m1 0h2m5 0h2m1 0h8m1 0h2M1 38.5h1m1 0h3m1 0h1m4 0h2m3 0h1m1 0h4m1 0h2m1 0h4m2 0h1m2 0h1m1 0h1m2 0h1M1 39.5h1m1 0h3m1 0h1m2 0h3m4 0h2m3 0h1m4 0h3m1 0h8M1 40.5h1m5 0h1m2 0h2m3 0h1m1 0h2m10 0h1m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1M1 41.5h7m1 0h1m1 0h1m3 0h1m2 0h1m2 0h1m4 0h5m1 0h1m1 0h1m2 0h1m1 0h1"/></svg>
+</div>
+    <div style="min-width:0">
+      <h2>Scan to open the app</h2>
+      <p>Install Expo Go first, then point your phone camera at this code.</p>
+      <div class="actions">
+        <a class="btn btn-gold" href="exps://u.expo.dev/b695cea2-bcee-4f53-afbb-e83134b3fc25?channel-name=expo-go&amp;runtime-version=exposdk:58.0.0">Open in Expo Go</a>
+        <button class="btn btn-ghost" id="copy" type="button">Copy link</button>
+      </div>
+      <div class="linkbox" id="link">exps://u.expo.dev/b695cea2-bcee-4f53-afbb-e83134b3fc25?channel-name=expo-go&amp;runtime-version=exposdk:58.0.0</div>
+      <div class="copied" id="copied" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <section aria-labelledby="how">
+    <h3 id="how">Get set up in three steps</h3>
+    <ol class="steps">
+      <li><div><strong>Install Expo Go</strong><p>It’s free. If you already have it, update it, because Classic Hub needs the latest version.</p>
+        <div class="stores">
+          <a class="btn btn-ghost" href="https://apps.apple.com/app/expo-go/id982107779" target="_blank" rel="noopener">App Store</a>
+          <a class="btn btn-ghost" href="https://play.google.com/store/apps/details?id=host.exp.exponent" target="_blank" rel="noopener">Google Play</a>
+        </div></div></li>
+      <li><div><strong>Scan the code</strong><p>iPhone: open the Camera app and tap the banner that appears. Android: open Expo Go and tap “Scan QR code”. Reading this on your phone? Tap “Open in Expo Go” above instead.</p></div></li>
+      <li><div><strong>Sign in with any Ghana number</strong><p>No real text message is sent. When asked for the code, enter <span class="code">123456</span>. You can also tap “Look around first” to skip signing in.</p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="try">
+    <h3 id="try">Things to try</h3>
+    <div class="try">
+      <div><b>Order dinner</b><p>Pick a restaurant, add food, check out and watch the courier on the map. Try promo code <span class="code">CLASSIC20</span>.</p></div>
+      <div><b>Book a caterer</b><p>Open the Book tab, choose an occasion and send a request. The vendor confirms within seconds, then you pay a deposit.</p></div>
+      <div><b>Run a restaurant</b><p>Account, then “Switch to vendor mode”. Answer booking requests, mark dishes sold out and see your sales.</p></div>
+      <div><b>Order with friends</b><p>On any restaurant page tap “Order with friends”. Pretend friends join and the basket shows who owes what.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="know">
+    <h3 id="know">Good to know</h3>
+    <div class="note">
+      <ul>
+        <li>All payments are pretend. No money moves, even when you choose MoMo or card.</li>
+        <li>Restaurants, people and prices are made up for testing.</li>
+        <li>Your orders and settings stay on your phone only.</li>
+        <li>New versions arrive by themselves the next time you open the app.</li>
+        <li>See “Project is incompatible with this version of Expo Go”? Update Expo Go from your app store.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Found a bug or have an idea? Tell the person who shared this page, and mention which screen you were on.</footer>
+</main>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy');
+  var box = document.getElementById('link');
+  var out = document.getElementById('copied');
+  btn.addEventListener('click', function () {
+    var text = box.textContent;
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(box);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      out.textContent = 'Link selected. Copy it from the menu.';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { out.textContent = 'Link copied.'; }, selectIt);
+    } else selectIt();
+  });
+})();
+</script>
+
+</body>
+</html>
